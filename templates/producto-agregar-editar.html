@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Agregar/Editar Producto
+{% endblock %}
+
+{%block username%}
+    {{datos.nombre}}
+{% endblock %}
+
+{%block userimg%}
+    {{url_for('static',filename='imgs/'+datos.img)}}
+{% endblock %}
+
+{%if producto is defined%}
+    {% set v_producto_id = producto['data']['id'] %}
+    {% set v_nombre = producto['data']['nombre'] %}
+    {% set v_precio = producto['data']['precio'] %}
+    {% set v_categoria_id = producto['data']['categoria_id'] %}
+    {% set v_display = 'visible'%}
+{%else%}
+    {% set v_producto_id = 0 %}
+    {% set v_nombre = "" %}
+    {% set v_precio = "" %}
+    {% set v_categoria_id = 0 %}
+    {% set v_display = 'invisible'%}
+{%endif%}
+
+
+{% block body %}
+    <nav class="navbar navbar-light bg-title">
+        <div class="container-fluid">
+            <h4>Agregar/Editar Producto</h4>
+        </div>
+    </nav>
+    <div class="col-md-12">
+        <form action="/productos/save" method="POST">
+
+            <div class="mb-3 row {{v_display}}">
+                <div class="col-md-1">
+                    <label class="form-label">ID</label>
+                    <input type="text" name="txtid" placeholder="ID" value="{{v_producto_id}}" class="form-control form-control-sm" required readonly>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" name="txtnombre" placeholder="Nombre" value="{{v_nombre}}" class="form-control form-control-sm" required autofocus>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-3">
+                    <label class="form-label">Precio</label>
+                    <input type="number" name="txtprecio" placeholder="Precio" value="{{v_precio}}" class="form-control form-control-sm" required min="0" step="0.01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Categoría</label>
+                    <select name="cbocategoria" class="form-select form-select-sm" required>
+                        {% for cat in categorias["data"] %}
+                            {% if v_categoria_id == cat['id'] %}
+                                <option selected value="{{cat['id']}}">{{cat['nombre']}}</option>
+                            {%else%}
+                                <option value="{{cat['id']}}">{{cat['nombre']}}</option>
+                            {%endif%}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary btn-sm btn-guardar"><i class="bi bi-save"></i> Guardar</button>
+                    <a href="/productos" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Regresar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

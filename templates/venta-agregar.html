@@ -1,0 +1,363 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Registrar venta
+{% endblock %}
+
+{%block username%}
+    {{datos.nombre}}
+{% endblock %}
+
+{%block userimg%}
+    {{url_for('static',filename='imgs/'+datos.img)}}
+{% endblock %}
+
+
+{% block body %}
+    <nav class="navbar navbar-light bg-title">
+        <div class="container-fluid">
+            <h4>Registrar venta</h4>
+        </div>
+    </nav>
+    <div class="col-md-12">
+        <form action="/ventas/save" method="POST" id="frmventa">
+            
+            <div class="mb-3 row"> <!--primera fila-->
+                <div class="col-md-2">
+                    <label class="form-label">Tipo de comprobante</label>
+                    <select name="cbotc" id="cbotc" class="form-select form-select-sm" required>
+                        {% for tc in tipos_comprobante["data"] %}
+                            <option value="{{tc['id']}}">{{tc['nombre']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Serie</label>
+                    <select name="cboserie" id="cboserie" class="form-select form-select-sm" required>
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">N.Doc</label>
+                    <input type="text" name="txtndoc" id="txtndoc" class="form-control form-control-sm" required readonly>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" name="txtfdoc" id="txtfdoc" value="{{fecha_venta}}" class="form-control form-control-sm" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Cliente</label>
+                    <select name="cbocliente" id="cbocliente" class="form-select form-select-sm" required>
+                        {% for cli in clientes["data"] %}
+                            <option value="{{cli['id']}}">{{cli['nombre']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Porc.IGV</label>
+                    <input type="text" name="txtporcentajeigv" id="txtporcentajeigv" value="{{porc_igv['data']['valor']}}" class="form-control form-control-sm" required readonly>
+                </div>
+
+            </div>
+
+            <div class="mb-3 row"> <!--segunda fila-->
+                <div class="col-md-4">
+                    <label class="form-label">Producto</label>
+                    <select name="cboproducto" id="cboproducto" class="form-select form-select-sm">
+                        <option value="">Seleccione un producto</option>
+                        {% for pro in productos["data"] %}
+                            <option value="{{pro['id']}}">{{pro['nombre']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Precio</label>
+                    <input type="text" name="txtprecio" id="txtprecio" class="form-control form-control-sm" readonly>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" name="txtcantidad" id="txtcantidad" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button id="btnagregar" type="button" class="btn btn-success btn-sm"><i class="bi bi-arrow-down"></i> Agregar</button>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <input type="hidden" name="txtproducto_id" id="txtproducto_id">
+                </div>
+                
+            </div>
+
+            <div class="mb-3 row"> <!--tercera fila-->
+                <div class="col-md-12">
+                    <table class="table table-striped" width="100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>PRODUCTO</th>
+                                <th class="text-right">CANTIDAD</th>
+                                <th class="text-right">PRECIO (S/)</th>
+                                <th class="text-right">IMPORTE</th>
+                                <th class="text-center">OPCIÓN</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="detalleventa" class="detalleventa">
+                        </tbody>
+
+                        <tfoot id="totales" class="totales">
+                            <tr>
+                                <th colspan="4" class="text-right">SUB TOTAL:</th>
+                                <th class="text-right" id="lblsubtotal">0.00</th>
+                                <th class="text-center"><input type="hidden" name="txtsubtotal" id="txtsubtotal"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-right">IGV:</th>
+                                <th class="text-right" id="lbligv">0.00</th>
+                                <th class="text-center"><input type="hidden" name="txtigv" id="txtigv"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-right">TOTAL NETO:</th>
+                                <th class="text-right" id="lbltotalneto">0.00</th>
+                                <th class="text-center"><input type="hidden" name="txttotalneto" id="txttotalneto"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-3 row"><!--cuarta fila-->
+                <div class="col-md-12">
+                    <input type="text" name="txtdetalleventa" id="txtdetalleventa" class="form-control form-control-sm">
+                </div>
+            </div>
+
+
+            <div class="mb-3 row"> <!--quinta fila-->
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary btn-sm btn-guardar"><i class="bi bi-save"></i> Guardar</button>
+                    <a href="/productos" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Regresar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+    <script lang="text/javascript">
+        //Cuando carga el documento (cuando se lee el contenido del documento o la página html)
+        $(document).ready(function(){
+            
+            //Cuando carga la página, dispare el evento onChange del combo "cbotc"
+            $("#cbotc").change();
+
+            //$("#cboproducto").change();
+        });
+
+        $("#cbotc").change(function(){
+            var v_tc_id = $("#cbotc").val();
+            
+            $.post //Llamar a la ruta utilizando el método POST
+            (
+                "/ventas/get/serie", //invocar a la ruta 
+                {tc_id: v_tc_id}, //Envíar el valor que espera recibir la ruta
+                function (data){ //Recoger el resultado que me da la ruta
+                    //La variable "data" contiene el resultado que me devuelve la Ruta
+                    if (data["status"] == true){
+                        $("#cboserie").empty(); //Limpiar el combo
+                        var v_series = data["data"];
+                        $.each(v_series, function(i, serie){
+                            var v_serie = serie["serie"];
+                            var v_elemento_cbo = '<option value="'+v_serie+'">'+v_serie+'</option>';
+                            $("#cboserie").append(v_elemento_cbo);
+                        });
+                    }else{
+                        //No hay datos de serie
+                        $("#cboserie").empty().append('<option value="">Sin series</option>');
+                    }
+
+                    //LLamar al evento onChange del combo cboserie
+                    $("#cboserie").change();
+
+                    //Limpiar a la caja de texto del ndoc
+                    $("#txtndoc").val("");
+                  
+                }
+            );
+        });
+
+
+        $("#cboserie").change(function(){
+            $.post
+            (
+                "/ventas/get/correlativo",
+                {serie_nro: $("#cboserie").val()},
+                function(data){
+                    if (data["status"]==true){
+                        var v_correlativo = data["data"]["corre"];
+                        $("#txtndoc").val(v_correlativo);
+                    }else{
+                        $("#txtndoc").val("");
+                    }
+                }
+           );
+        });
+
+
+        $("#cboproducto").change(function(){
+            $.post
+            (
+                "/productos/get/data",
+                {producto_id: $("#cboproducto").val()},
+                function(data){
+                    if (data["status"]==true){
+                        var v_precio = data["data"]["precio"];
+                        var v_producto_id = data["data"]["id"];
+                        $("#txtprecio").val(v_precio);
+                        $("#txtproducto_id").val(v_producto_id);
+                        $("#txtcantidad").focus();
+                    }else{
+                        $("#txtprecio").val("sin precio");
+                    }
+                }
+           );
+        });
+
+        $("#btnagregar").click(function(){
+            //Captura los datos en variables. Los datos estan en los controles
+            var producto_id = $("#txtproducto_id").val(); //hidden
+            var producto = $("#cboproducto option:selected").text();
+            var precio = $("#txtprecio").val();
+            var cantidad = $("#txtcantidad").val();
+            var importe = cantidad * precio;
+
+            //Validar que haya seleccionado un producto
+            if (producto_id==""){
+                alert("Debe seleccionar un producto");
+                return;
+            }
+
+
+            //Elabora el código html para agregarlo en el tbody "detalleventa"
+            var fila = '';
+            fila = fila + '<tr>';
+                fila = fila + '<td>'+producto_id+'</td>';
+                fila = fila + '<td>'+producto+'</td>';
+                fila = fila + '<td class="text-right">'+cantidad+'</td>';
+                fila = fila + '<td class="text-right">'+precio+'</td>';
+                fila = fila + '<td class="text-right">'+importe.toFixed(2)+'</td>';
+                fila = fila + '<td class="text-center"><button id="btneliminardetalle" type="button" class="btn btn-danger btn-sm btneliminardetalle" title="Eliminar"><i class="bi bi-trash"></i></button></td>';
+            fila = fila + '</tr>';
+
+            //Agregar el detalle al tbody "detalleventa"
+            $("#detalleventa").append(fila);
+            
+
+            //Limpiar los controles
+            $("#txtproducto_id").val("");
+            $("#cboproducto").val("");
+            $("#txtprecio").val("");
+            $("#txtcantidad").val("");
+
+            //Enfocar al cboproducto
+            $("#cboproducto").focus();
+
+            //Calcular totales
+            calcularTotales();
+            
+        });
+
+
+        //Llamar al tbody "detalleventa" mediante su propiedad "class"
+        $(document).on("click", "tbody.detalleventa button.btneliminardetalle", function(){
+            //Eliminar el producto 
+            //this (btneliminardetalle)
+            $(this).parents("tr").remove();
+
+            //Calcular totales
+            calcularTotales();
+        });
+
+
+        function calcularTotales(){
+            var subTotal=0;
+            var igv=0;
+            var totalNeto=0;
+            var porcentajeIgv = 0;
+            
+            //Recorrer el tbody "detalleventa", haciendo uso de su ID
+            $("#detalleventa > tr").each(function(){
+                //Este bucle recorre todos los TR que estan dentro del tbody "detalleventa
+                //Obtener el valor que esta grabado en la columna 4(importe)
+                var importe = $(this).find('td').eq(4).html();
+                totalNeto = totalNeto + Number.parseFloat(importe);
+            });
+
+            //Obtener el porcentaje de IGV
+            porcentajeIgv = $("#txtporcentajeigv").val();
+
+            //Calcular subtotal e IGV
+            subTotal = totalNeto / (1 + (Number.parseFloat(porcentajeIgv)/100));
+            igv = totalNeto - subTotal;
+
+            //Imprimir los totales
+            $("#lblsubtotal").html(subTotal.toFixed(2));
+            $("#lbligv").html(igv.toFixed(2));
+            $("#lbltotalneto").html(totalNeto.toFixed(2));
+
+            //Asignar totales a las cajas de texto (ocultas)
+            $("#txtsubtotal").val(subTotal.toFixed(2));
+            $("#txtigv").val(igv.toFixed(2));
+            $("#txttotalneto").val(totalNeto.toFixed(2));
+
+        }
+
+
+        $("#frmventa").submit(function(event){
+            
+            //Convertir el detalle de la venta en JSON
+            var arrayDetalleVenta = Array();
+
+            $("#detalleventa > tr").each(function(){
+                //Este bucle recorre todos los TR que estan dentro del tbody "detalleventa"
+                var producto_id = $(this).find('td').eq(0).html();
+                var cantidad = $(this).find('td').eq(2).html();
+                var precio = $(this).find('td').eq(3).html();
+
+                //Crear ub objeto para almacenar el producto_id, cantidad y precio
+                objDetalleVenta = new Object();
+                objDetalleVenta.producto_id = producto_id;
+                objDetalleVenta.cantidad = cantidad;
+                objDetalleVenta.precio = precio;
+
+                //Cargar el objeto al arrayDetalleVenta
+                arrayDetalleVenta.push(objDetalleVenta);
+            });
+
+            //Convertir el arrayDetalleVenta en formato JSON
+            var jsonDetalleVenta = JSON.stringify(arrayDetalleVenta);
+
+            //Imprimir el JSON en la caja de texto
+            $("#txtdetalleventa").val(jsonDetalleVenta);
+
+            //Evitar que se procese el formulario
+            //event.preventDefault();
+
+
+        });
+
+
+
+    </script>
+{% endblock %}

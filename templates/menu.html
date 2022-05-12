@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Menú principal
+{% endblock %}
+
+{%block username%}
+    {{datos.nombre}}
+{% endblock %}
+
+{%block userimg%}
+    {{url_for('static',filename='imgs/'+datos.img)}}
+{% endblock %}
+
+{% block body %}
+    <br>
+    <h3>Bienvenido al sistema</h3>
+    {{datos.email}}
+{% endblock %}

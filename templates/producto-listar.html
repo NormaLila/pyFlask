@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Productos
+{% endblock %}
+
+{% block style%}
+<!--Incorpora el CSS de DataTable-->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
+{% endblock %}
+
+{%block username%}
+    {{datos.nombre}}
+{% endblock %}
+
+{%block userimg%}
+    {{url_for('static',filename='imgs/'+datos.img)}}
+{% endblock %}
+
+{% block body %}
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+    <nav class="navbar navbar-light bg-title">
+        <div class="container-fluid">
+            <h4>Listado de productos</h4>
+            <a href="/productos/add" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Nuevo</a>
+        </div>
+    </nav>
+    <br>
+    <div class="col-md-12">
+        <table id="listado" class="table table-striped" width="100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>PRODUCTO</th>
+                    <th>CATEGORIA</th>
+                    <th class="text-right">PRECIO (S/)</th>
+                    <th class="text-center">OPCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in productos["data"] %}
+                    <tr>
+                        <td>{{ prod['id'] }}</td>
+                        <td>{{ prod['producto'] }}</td>
+                        <td>{{ prod['categoria'] }}</td>
+                        <td class="text-right">{{ "%.2f"|format(prod['precio']) }}</td>
+                        <td class="text-center">
+                            <a href="productos/edit/{{prod['id']}}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Editar</a>
+                            <a href="productos/delete/{{prod['id']}}" class="btn btn-danger btn-sm btn-eliminar"><i class="bi bi-basket"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+
+
+    <script lang="text/javascript">
+        $(document).ready(function(){
+            $('#listado').DataTable({
+                "scrollX": true,
+                "pageLength": 6,
+                "language": {"url": "{{url_for('static', filename='json/language-spanish-datatable.json')}}"},
+                "dom": 'Brftip',
+                "buttons":['excel','pdf','print','copy'],
+                "order": [[1,"asc"]]
+            });
+        });
+    </script>
+
+{% endblock %}
